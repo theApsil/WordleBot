@@ -170,13 +170,17 @@ func handleGuess(chatID int64, guess string, bot *tgbotapi.BotAPI) {
 
 func generateFeedbackMessage(word, guess string) string {
 	var feedback []string
-	for i := 0; i < len([]rune(word)); i++ {
-		if guess[i] == word[i] {
-			feedback = append(feedback, fmt.Sprintf("%c 🟩", guess[i]))
-		} else if strings.Contains(word, string(guess[i])) {
-			feedback = append(feedback, fmt.Sprintf("%c 🟨", guess[i]))
+	wordRune := []rune(word)
+	guessRune := []rune(guess)
+	for i := 0; i < len(wordRune); i++ {
+		if i < len(guessRune) && guessRune[i] == wordRune[i] {
+			feedback = append(feedback, fmt.Sprintf("%c 🟩", guessRune[i]))
+		} else if i < len(guessRune) && strings.ContainsRune(string(wordRune), guessRune[i]) {
+			feedback = append(feedback, fmt.Sprintf("%c 🟨", guessRune[i]))
+		} else if i < len(guessRune) {
+			feedback = append(feedback, fmt.Sprintf("%c ⬛", guessRune[i]))
 		} else {
-			feedback = append(feedback, fmt.Sprintf("%c ⬛", guess[i]))
+			feedback = append(feedback, "⬛")
 		}
 	}
 	return strings.Join(feedback, " ")
