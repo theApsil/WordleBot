@@ -43,17 +43,19 @@ func loadWordsFromFile(filename string) []string {
 	words := []string{}
 	for _, line := range lines {
 		word := strings.TrimSpace(line)
-		if len(word) == 5 {
+		log.Print(word, " ", len(word))
+		if len(word) == 5 || len(word) == 10 {
 			words = append(words, word)
+			log.Print("Добавлено слово:", word, " ", len(word))
 		}
 	}
 	return words
 }
 
 func main() {
+	loadEnv()
 	englishWords = loadWordsFromFile("words_eng.txt")
 	russianWords = loadWordsFromFile("words_rus.txt")
-	loadEnv()
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
@@ -139,8 +141,14 @@ func handleLanguageSelection(callback *tgbotapi.CallbackQuery, bot *tgbotapi.Bot
 }
 
 func startNewGame(chatID int64, words []string, bot *tgbotapi.BotAPI, language string) {
+	if len(words) == 0 {
+		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Список слов для языка %s пуст. Игра невозможна.", language))
+		bot.Send(msg)
+		return
+	}
+
 	rand.Seed(time.Now().UnixNano())
-	word := words[rand.Intn(len(words))]
+	word := words[rand.Intn(len(words))+1]
 
 	userGames[chatID] = &GameState{
 		Word:     word,
