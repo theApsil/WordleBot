@@ -172,16 +172,33 @@ func generateFeedbackMessage(word, guess string) string {
 	var feedback []string
 	wordRune := []rune(word)
 	guessRune := []rune(guess)
+	used := make([]bool, len(wordRune))
+
 	for i := 0; i < len(wordRune); i++ {
 		if i < len(guessRune) && guessRune[i] == wordRune[i] {
 			feedback = append(feedback, fmt.Sprintf("%c 🟩", guessRune[i]))
-		} else if i < len(guessRune) && strings.ContainsRune(string(wordRune), guessRune[i]) {
-			feedback = append(feedback, fmt.Sprintf("%c 🟨", guessRune[i]))
-		} else if i < len(guessRune) {
-			feedback = append(feedback, fmt.Sprintf("%c ⬛", guessRune[i]))
+			used[i] = true
 		} else {
-			feedback = append(feedback, "⬛")
+			feedback = append(feedback, "")
 		}
 	}
+
+	for i := 0; i < len(wordRune); i++ {
+		if feedback[i] == "" && i < len(guessRune) {
+			found := false
+			for j := 0; j < len(wordRune); j++ {
+				if !used[j] && wordRune[j] == guessRune[i] {
+					feedback[i] = fmt.Sprintf("%c 🟨", guessRune[i])
+					used[j] = true
+					found = true
+					break
+				}
+			}
+			if !found {
+				feedback[i] = fmt.Sprintf("%c ⬛", guessRune[i])
+			}
+		}
+	}
+
 	return strings.Join(feedback, " ")
 }
