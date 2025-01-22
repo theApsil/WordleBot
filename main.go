@@ -21,8 +21,8 @@ type GameState struct {
 var (
 	token        string
 	userGames    = make(map[int64]*GameState)
-	englishWords = []string{"apple", "grape", "mango", "berry", "lemon", "peach", "melon", "plums", "cherry", "guava"}
-	russianWords = []string{"книга", "слово", "мирно", "игрок", "столб", "птица", "груша", "сахар", "яблок", "кадык"}
+	englishWords []string
+	russianWords []string
 	maxAttempts  = 6
 )
 
@@ -34,7 +34,25 @@ func loadEnv() {
 	token = os.Getenv("TELEGRAM_BOT_TOKEN")
 }
 
+func loadWordsFromFile(filename string) []string {
+	file, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatalf("Ошибка чтения файла %s: %v", filename, err)
+	}
+	lines := strings.Split(string(file), "\n")
+	words := []string{}
+	for _, line := range lines {
+		word := strings.TrimSpace(line)
+		if len(word) == 5 {
+			words = append(words, word)
+		}
+	}
+	return words
+}
+
 func main() {
+	englishWords = loadWordsFromFile("words_eng.txt")
+	russianWords = loadWordsFromFile("words_rus.txt")
 	loadEnv()
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
