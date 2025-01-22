@@ -43,12 +43,13 @@ func loadWordsFromFile(filename string) []string {
 	words := []string{}
 	for _, line := range lines {
 		word := strings.TrimSpace(line)
-		log.Print(word, " ", len(word))
-		if len(word) == 5 || len(word) == 10 {
+		if len([]rune(word)) == 5 {
 			words = append(words, word)
-			log.Print("Добавлено слово:", word, " ", len(word))
+		} else {
+			log.Printf("Пропущено слово: '%s' (длина в символах: %d)", word, len([]rune(word)))
 		}
 	}
+	log.Printf("Загружено слов из файла %s: %d", filename, len(words))
 	return words
 }
 
