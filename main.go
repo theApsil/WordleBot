@@ -54,17 +54,19 @@ func loadWordsFromFile(filename string) []string {
 }
 
 func main() {
-	loadEnv()
 	englishWords = loadWordsFromFile("words_eng.txt")
 	russianWords = loadWordsFromFile("words_rus.txt")
+
+	loadEnv()
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
+
 	}
 
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+	u.Timeout = 90
 
 	updates := bot.GetUpdatesChan(u)
 
